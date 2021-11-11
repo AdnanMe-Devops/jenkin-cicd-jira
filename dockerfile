@@ -1,0 +1,37 @@
+version: "3.5"
+services:
+  jenkins:
+    container_name: jenkins
+    image: jenkins/jenkins:lts
+    networks:
+      - cloudcademy
+    ports:
+      - "8080:8080"
+    environment:
+      - DOCKER_HOST=tcp://socat:2375
+    depends_on:
+      - socat
+    privileged: true
+  jira:
+    container_name: jira
+    image: jira-ca:latest
+    #image: dchevell/jira-software:latest
+    networks:
+      - cloudcademy
+    ports:
+      - 8888:8080      
+  socat:
+    container_name: socat
+    image: socat-ca:latest
+   #image: alpine/socat:latest
+    networks:
+      - cloudcademy
+    command: tcp-listen:2375,fork,reuseaddr unix-connect:/var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    expose:
+      - "2375"
+
+networks:
+  cloudcademy:
+    name: cloudcademy
